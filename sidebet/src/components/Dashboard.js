@@ -1,7 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useBets } from '../contexts/BetContext';
+
+const useCountAnimation = (endValue, duration = 2000) => {
+  const [count, setCount] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (endValue !== count) {
+      setIsAnimating(true);
+      const startTime = Date.now();
+      const startValue = count;
+      const changeInValue = endValue - startValue;
+
+      const animate = () => {
+        const currentTime = Date.now();
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for smooth animation
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+        const currentValue = startValue + (changeInValue * easeOutQuart);
+        
+        setCount(parseFloat(currentValue.toFixed(2)));
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          setCount(endValue);
+          setIsAnimating(false);
+        }
+      };
+      
+      requestAnimationFrame(animate);
+    }
+  }, [endValue, duration]);
+
+  return { count, isAnimating };
+};
+
+const AnimatedValue = ({ value, className }) => {
+  const { count } = useCountAnimation(value, 1500);
+  
+  return (
+    <span className={className}>
+      {value >= 0 ? '$' : '-$'}{Math.abs(count).toFixed(2)}
+    </span>
+  );
+};
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -166,12 +213,15 @@ const Dashboard = () => {
           </div>
           
           <div className="mt-3 pt-3 border-t border-gray-700">
-            <p className="text-gray-400 text-sm mb-1">
-              Created by: <span className="text-blue-400">{bet.creator?.name || 'User'}</span>
-            </p>
-            {bet.acceptedBy && (
-              <p className="text-gray-400 text-sm">
-                Accepted by: <span className="text-green-400">{bet.acceptedBy?.name || 'User'}</span>
+            {bet.acceptedBy ? (
+              <p className="text-gray-400 text-sm mb-1">
+                <span className="text-blue-400">{bet.creator?.name || 'User'}</span>
+                {' vs '}
+                <span className="text-blue-400">{bet.acceptedBy?.name || 'User'}</span>
+              </p>
+            ) : (
+              <p className="text-gray-400 text-sm mb-1">
+                Created by: <span className="text-blue-400">{bet.creator?.name || 'User'}</span>
               </p>
             )}
           </div>
@@ -261,12 +311,10 @@ const Dashboard = () => {
             </p>
           </div>
           
-          <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 min-w-[200px]">
-            <div className="flex justify-between items-center">
-              <h3 className="text-sm font-medium text-gray-400 mr-4">Your Total Bets Outcome</h3>
-              <span className={`font-bold text-lg ${totalOutcome.net >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {totalOutcome.net >= 0 ? '$' : '-$'}{Math.abs(totalOutcome.net).toFixed(2)}
-              </span>
+          <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 w-[180px] md:w-[220px]">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center">
+              <h3 className="text-md font-medium text-gray-400 mb-2 md:mb-0">Total</h3>
+              <AnimatedValue value={totalOutcome.net} className={`font-bold text-lg ${totalOutcome.net >= 0 ? 'text-green-400' : 'text-red-400'}`} />
             </div>
           </div>
         </div>

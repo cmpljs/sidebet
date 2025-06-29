@@ -192,9 +192,6 @@ const AcceptBet = () => {
         <div className="card text-center">
           <h1 className="text-2xl font-bold text-red-400 mb-4">Bet Not Found</h1>
           <p className="text-gray-400 mb-6">{error}</p>
-          <Link to="/dashboard" className="btn-primary">
-            Go to Dashboard
-          </Link>
         </div>
       </div>
     );
@@ -217,11 +214,6 @@ const AcceptBet = () => {
         </div>
       )}
       <div className="mb-8">
-        <div className="flex items-center justify-end mb-4">
-          <Link to="/dashboard" className="btn-secondary">
-            Back
-          </Link>
-        </div>
         {user && bet.creator._id === user._id ? (
           <div className="flex items-center justify-between">
             <div>
@@ -289,8 +281,8 @@ const AcceptBet = () => {
                 {getStatusText(getStatusFromUserPerspective(bet))}
               </span>
               {bet.acceptedBy && (
-                <span className="text-gray-300 text-sm">
-                  • Accepted by {bet.acceptedBy.name || 'User'}
+                <span className="text-blue-400 text-sm">
+                  • {bet.creator?.name || 'User'} vs {bet.acceptedBy.name || 'User'}
                 </span>
               )}
             </div>
@@ -315,16 +307,10 @@ const AcceptBet = () => {
                     {deleting ? 'Deleting...' : 'Delete Bet'}
                   </button>
                 )}
-                <Link to="/dashboard" className="btn-secondary w-full">
-                  Go to Dashboard
-                </Link>
               </div>
             ) : bet.acceptedBy ? (
               <div className="flex-1">
                 <p className="text-gray-400 mb-4">This bet has already been accepted.</p>
-                <Link to="/dashboard" className="btn-secondary w-full">
-                  Go to Dashboard
-                </Link>
               </div>
             ) : (
               <button
@@ -337,6 +323,12 @@ const AcceptBet = () => {
             )}
           </div>
         </div>
+      </div>
+      
+      <div className="mt-6">
+        <Link to="/dashboard" className="btn-secondary w-full">
+          Back to Dashboard
+        </Link>
       </div>
     </div>
   );

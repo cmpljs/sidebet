@@ -2,7 +2,7 @@
   "name": "sidebet",
   "version": "1.0.0",
   "description": "A React betting app with authentication and bet management",
-  "homepage": ".",
+  "homepage": "/",
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",

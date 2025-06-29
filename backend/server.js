@@ -54,7 +54,9 @@ app.use('/api/bets', betRoutes);
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../sidebet/build')));
   
-  app.get('*', (req, res) => {
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) return next();
+    if (req.path.includes('.')) return res.status(404).end(); // 404 for missing static files
     res.sendFile(path.join(__dirname, '../sidebet/build/index.html'));
   });
 }

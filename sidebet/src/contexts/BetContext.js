@@ -93,6 +93,16 @@ export const BetProvider = ({ children }) => {
 
   const getAllBets = () => bets;
 
+  const refreshBets = async () => {
+    if (!jwt) return;
+    try {
+      const res = await api.get('/bets/my-bets', { token: jwt });
+      setBets(res.data.bets || []);
+    } catch (err) {
+      console.error('Error refreshing bets:', err);
+    }
+  };
+
   const value = {
     bets,
     createBet,
@@ -104,6 +114,7 @@ export const BetProvider = ({ children }) => {
     getBetsByCreator,
     getBetsByAcceptor,
     getAllBets,
+    refreshBets,
     loading,
   };
 

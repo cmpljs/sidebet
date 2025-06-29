@@ -10,7 +10,7 @@ const register = async (req, res) => {
   try {
     const { email, password, name } = req.body;
 
-    // Check if user already exists
+    
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -19,14 +19,14 @@ const register = async (req, res) => {
       });
     }
 
-    // Create new user
+    
     const user = await User.create({
       email,
       password,
       name
     });
 
-    // Generate JWT token
+    
     const token = generateToken(user);
 
     res.status(201).json({
@@ -55,7 +55,7 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check if user exists
+    
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({
@@ -64,7 +64,7 @@ const login = async (req, res) => {
       });
     }
 
-    // Check if password matches
+    
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -73,11 +73,11 @@ const login = async (req, res) => {
       });
     }
 
-    // Update last login
+    
     user.lastLogin = new Date();
     await user.save();
 
-    // Generate JWT token
+    
     const token = generateToken(user);
 
     res.json({

@@ -63,8 +63,9 @@ const Dashboard = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending':
-      case 'accepted':
         return 'bg-yellow-900 text-yellow-200';
+      case 'accepted':
+        return 'bg-blue-500/10 text-green-200';
       case 'won':
         return 'bg-green-900 text-green-200';
       case 'lost':
@@ -133,11 +134,22 @@ const Dashboard = () => {
     }
   };
 
-  const BetCard = ({ bet, showCreator = false }) => {
+  const BetCard = ({ bet, showCreator = false, index = 0, isNew = false }) => {
     const userStatus = getStatusFromUserPerspective(bet, showCreator);
     
     return (
-      <div className="card hover:bg-gray-750 transition-colors duration-200">
+      <div 
+        className="card hover:bg-gray-750 transition-all duration-300 transform animate-slide-up relative"
+        style={{
+          animationDelay: `${index * 100}ms`,
+          animationFillMode: 'both'
+        }}
+      >
+        {isNew && (
+          <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+            NEW
+          </div>
+        )}
         <Link to={`/accept-bet/${bet._id}`} className="block">
           <div className="flex justify-between items-start mb-3">
             <h3 className="text-lg font-semibold text-white">{bet.name}</h3>
@@ -204,6 +216,40 @@ const Dashboard = () => {
   const allBets = [...createdBets, ...acceptedBets];
   const totalOutcome = calculateTotalOutcome();
 
+  const sortedBets = [...allBets].sort((a, b) => {
+    const getStatusPriority = (status) => {
+      switch (status) {
+        case 'pending':
+        case 'accepted':
+          return 1;
+        case 'won':
+        case 'lost':
+          return 2;
+        default:
+          return 3;
+      }
+    };
+
+    const aPriority = getStatusPriority(a.status);
+    const bPriority = getStatusPriority(b.status);
+
+    if (aPriority !== bPriority) {
+      return aPriority - bPriority;
+    }
+
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
+  const newestBetId = sortedBets.length > 0 ? sortedBets[0]._id : null;
+
+  const isBetNew = (bet) => {
+    const now = new Date();
+    const betDate = new Date(bet.createdAt);
+    const timeDiff = now - betDate;
+    const fiveMinutes = 5 * 60 * 1000;
+    return timeDiff <= fiveMinutes;
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="mb-8">
@@ -257,12 +303,19 @@ const Dashboard = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {createdBets.map((bet) => (
-              <BetCard key={bet._id} bet={bet} showCreator={true} />
-            ))}
-            {acceptedBets.map((bet) => (
-              <BetCard key={bet._id} bet={bet} />
-            ))}
+            {sortedBets.map((bet, index) => {
+              const isCreator = bet.creator && bet.creator._id === user._id;
+              const isNew = isBetNew(bet);
+              return (
+                <BetCard 
+                  key={bet._id} 
+                  bet={bet} 
+                  showCreator={isCreator} 
+                  index={index} 
+                  isNew={isNew} 
+                />
+              );
+            })}
           </div>
         )}
       </div>

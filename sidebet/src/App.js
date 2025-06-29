@@ -10,13 +10,13 @@ import CreateBet from './components/CreateBet';
 import AcceptBet from './components/AcceptBet';
 import './index.css';
 
-// Protected Route component
+
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" />;
 };
 
-// Public Route component (redirects to dashboard if already logged in)
+
 const PublicRoute = ({ children }) => {
   const { user } = useAuth();
   return user ? <Navigate to="/dashboard" /> : children;

@@ -8,12 +8,12 @@ const protect = async (req, res, next) => {
   try {
     let token;
 
-    // Get token from Authorization header
+    
     if (req.headers.authorization) {
       token = extractTokenFromHeader(req.headers.authorization);
     }
 
-    // Check if token exists
+    
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -22,10 +22,10 @@ const protect = async (req, res, next) => {
     }
 
     try {
-      // Verify token
+      
       const decoded = verifyToken(token);
 
-      // Get user from token
+      
       const user = await User.findById(decoded.id);
       if (!user) {
         return res.status(401).json({
@@ -34,7 +34,7 @@ const protect = async (req, res, next) => {
         });
       }
 
-      // Add user to request object
+      
       req.user = user;
       next();
     } catch (error) {
@@ -59,23 +59,23 @@ const optionalAuth = async (req, res, next) => {
   try {
     let token;
 
-    // Get token from Authorization header
+    
     if (req.headers.authorization) {
       token = extractTokenFromHeader(req.headers.authorization);
     }
 
     if (token) {
       try {
-        // Verify token
+        
         const decoded = verifyToken(token);
 
-        // Get user from token
+        
         const user = await User.findById(decoded.id);
         if (user) {
           req.user = user;
         }
       } catch (error) {
-        // Token is invalid, but we don't fail the request
+        
         console.log('Invalid token in optional auth:', error.message);
       }
     }

@@ -17,7 +17,7 @@ const createBet = async (req, res) => {
       creator
     });
 
-    // Populate creator details
+    
     await bet.populate('creator', 'name email');
 
     res.status(201).json({
@@ -86,7 +86,7 @@ const acceptBet = async (req, res) => {
       });
     }
 
-    // Check if bet is already accepted
+    
     if (bet.acceptedBy) {
       return res.status(400).json({
         success: false,
@@ -94,7 +94,7 @@ const acceptBet = async (req, res) => {
       });
     }
 
-    // Check if user is trying to accept their own bet
+    
     if (bet.creator.toString() === req.user._id.toString()) {
       return res.status(400).json({
         success: false,
@@ -102,13 +102,13 @@ const acceptBet = async (req, res) => {
       });
     }
 
-    // Accept the bet
+    
     bet.acceptedBy = req.user._id;
     bet.status = 'accepted';
     bet.acceptedAt = new Date();
     await bet.save();
 
-    // Populate user details
+    
     await bet.populate('creator', 'name email');
     await bet.populate('acceptedBy', 'name email');
 
@@ -222,7 +222,7 @@ const deleteBet = async (req, res) => {
       });
     }
 
-    // Check if user is the creator of the bet
+    
     if (bet.creator.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
@@ -230,7 +230,7 @@ const deleteBet = async (req, res) => {
       });
     }
 
-    // Check if bet has already been accepted
+    
     if (bet.acceptedBy) {
       return res.status(400).json({
         success: false,
@@ -269,7 +269,7 @@ const markBetAsWon = async (req, res) => {
       });
     }
 
-    // Check if user is the creator of the bet
+    
     if (bet.creator.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
@@ -277,7 +277,7 @@ const markBetAsWon = async (req, res) => {
       });
     }
 
-    // Check if bet has been accepted
+    
     if (!bet.acceptedBy) {
       return res.status(400).json({
         success: false,
@@ -285,7 +285,7 @@ const markBetAsWon = async (req, res) => {
       });
     }
 
-    // Check if bet is already marked as won or lost
+    
     if (bet.status === 'won' || bet.status === 'lost') {
       return res.status(400).json({
         success: false,
@@ -293,13 +293,13 @@ const markBetAsWon = async (req, res) => {
       });
     }
 
-    // Mark the bet as won by the creator
+    
     bet.status = 'won';
     bet.winner = bet.creator;
     bet.completedAt = new Date();
     await bet.save();
 
-    // Populate user details
+    
     await bet.populate('creator', 'name email');
     await bet.populate('acceptedBy', 'name email');
     await bet.populate('winner', 'name email');
@@ -336,7 +336,7 @@ const markBetAsLost = async (req, res) => {
       });
     }
 
-    // Check if user is the creator of the bet
+    
     if (bet.creator.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
@@ -344,7 +344,7 @@ const markBetAsLost = async (req, res) => {
       });
     }
 
-    // Check if bet has been accepted
+    
     if (!bet.acceptedBy) {
       return res.status(400).json({
         success: false,
@@ -352,7 +352,7 @@ const markBetAsLost = async (req, res) => {
       });
     }
 
-    // Check if bet is already marked as won or lost
+    
     if (bet.status === 'won' || bet.status === 'lost') {
       return res.status(400).json({
         success: false,
@@ -360,13 +360,13 @@ const markBetAsLost = async (req, res) => {
       });
     }
 
-    // Mark the bet as lost by the creator (won by the acceptor)
+    
     bet.status = 'lost';
     bet.winner = bet.acceptedBy;
     bet.completedAt = new Date();
     await bet.save();
 
-    // Populate user details
+    
     await bet.populate('creator', 'name email');
     await bet.populate('acceptedBy', 'name email');
     await bet.populate('winner', 'name email');

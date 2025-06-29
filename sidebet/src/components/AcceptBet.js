@@ -6,7 +6,7 @@ import { useBets } from '../contexts/BetContext';
 const AcceptBet = () => {
   const { betId } = useParams();
   const { user } = useAuth();
-  const { getBetById, acceptBet, deleteBet } = useBets();
+  const { getBetById, acceptBet, deleteBet, refreshBets } = useBets();
   const navigate = useNavigate();
   
   const [bet, setBet] = useState(null);
@@ -56,8 +56,9 @@ const AcceptBet = () => {
     try {
       await acceptBet(betId);
       setSuccess('Bet accepted successfully!');
-      setTimeout(() => {
-        window.location.reload();
+      setTimeout(async () => {
+        await refreshBets();
+        navigate('/dashboard');
       }, 2000);
     } catch (err) {
       setError('Failed to accept bet. Please try again.');
@@ -135,8 +136,9 @@ const AcceptBet = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending':
-      case 'accepted':
         return 'bg-yellow-900 text-yellow-200';
+      case 'accepted':
+        return 'bg-blue-500/10 text-green-200';
       case 'won':
         return 'bg-green-900 text-green-200';
       case 'lost':

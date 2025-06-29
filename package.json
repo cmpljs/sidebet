@@ -7,10 +7,12 @@
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:frontend": "cd sidebet && npm start",
     "dev:backend": "cd backend && npm run dev",
-    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start": "npm run start:backend",
     "start:frontend": "cd sidebet && npm start",
     "start:backend": "cd backend && npm start",
     "build": "cd sidebet && npm run build",
+    "build:backend": "cd backend && npm install",
+    "build:frontend": "cd sidebet && npm install && npm run build",
     "install:all": "npm install && cd sidebet && npm install && cd ../backend && npm install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

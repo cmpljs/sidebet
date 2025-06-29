@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const path = require('path');
 require('dotenv').config({ path: './config.env' });
 
 // Import database connection
@@ -49,11 +50,20 @@ app.get('/health', (req, res) => {
 app.use('/api', authRoutes);
 app.use('/api/bets', betRoutes);
 
-// 404 handler
-app.use('*', (req, res) => {
+// Serve static files from React build in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../sidebet/build')));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../sidebet/build/index.html'));
+  });
+}
+
+// 404 handler for API routes
+app.use('/api/*', (req, res) => {
   res.status(404).json({
     success: false,
-    message: `Route ${req.originalUrl} not found`
+    message: `API Route ${req.originalUrl} not found`
   });
 });
 

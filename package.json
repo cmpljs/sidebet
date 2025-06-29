@@ -1,0 +1,35 @@
+{
+  "name": "sidebet-monorepo",
+  "version": "1.0.0",
+  "description": "SideBet - A complete betting application with React frontend and Node.js backend",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd sidebet && npm start",
+    "dev:backend": "cd backend && npm run dev",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:frontend": "cd sidebet && npm start",
+    "start:backend": "cd backend && npm start",
+    "build": "cd sidebet && npm run build",
+    "install:all": "npm install && cd sidebet && npm install && cd ../backend && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "keywords": [
+    "react",
+    "nodejs",
+    "express",
+    "mongodb",
+    "jwt",
+    "betting",
+    "monorepo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "workspaces": [
+    "sidebet",
+    "backend"
+  ]
+} 

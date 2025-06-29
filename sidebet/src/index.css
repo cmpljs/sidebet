@@ -56,6 +56,10 @@ code {
   @apply bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
 }
 
+.btn-danger {
+  @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+}
+
 /* Card styles */
 .card {
   @apply bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg;
@@ -69,4 +73,15 @@ code {
 /* Link styles */
 .link {
   @apply text-blue-400 hover:text-blue-300 transition-colors duration-200;
+}
+
+/* Custom number input arrows (spin buttons) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
 } 

@@ -52,6 +52,30 @@ export const BetProvider = ({ children }) => {
     return res.data.bet;
   };
 
+  const deleteBet = async (betId) => {
+    if (!jwt) throw new Error('Not authenticated');
+    await api.delete(`/bets/${betId}`, { token: jwt });
+    setBets((prev) => prev.filter((bet) => bet._id !== betId));
+  };
+
+  const markBetAsWon = async (betId) => {
+    if (!jwt) throw new Error('Not authenticated');
+    const res = await api.post(`/bets/${betId}/mark-won`, {}, { token: jwt });
+    setBets((prev) =>
+      prev.map((bet) => (bet._id === betId ? res.data.bet : bet))
+    );
+    return res.data.bet;
+  };
+
+  const markBetAsLost = async (betId) => {
+    if (!jwt) throw new Error('Not authenticated');
+    const res = await api.post(`/bets/${betId}/mark-lost`, {}, { token: jwt });
+    setBets((prev) =>
+      prev.map((bet) => (bet._id === betId ? res.data.bet : bet))
+    );
+    return res.data.bet;
+  };
+
   const getBetById = async (betId) => {
     const res = await api.get(`/bets/${betId}`, { token: jwt });
     return res.data.bet;
@@ -73,6 +97,9 @@ export const BetProvider = ({ children }) => {
     bets,
     createBet,
     acceptBet,
+    deleteBet,
+    markBetAsWon,
+    markBetAsLost,
     getBetById,
     getBetsByCreator,
     getBetsByAcceptor,

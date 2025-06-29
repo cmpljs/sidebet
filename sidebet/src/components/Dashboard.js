@@ -5,11 +5,36 @@ import { useBets } from '../contexts/BetContext';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { getBetsByCreator, getBetsByAcceptor, loading } = useBets();
-  const [activeTab, setActiveTab] = useState('created');
+  const { getBetsByCreator, getBetsByAcceptor, markBetAsWon, markBetAsLost, loading } = useBets();
+  const [updatingBet, setUpdatingBet] = useState(null);
 
   const createdBets = getBetsByCreator();
   const acceptedBets = getBetsByAcceptor();
+
+  const calculateTotalOutcome = () => {
+    const allBets = [...createdBets, ...acceptedBets];
+    let totalWon = 0;
+    let totalLost = 0;
+
+    allBets.forEach(bet => {
+      if (bet.status === 'won' || bet.status === 'lost') {
+        const isCreator = bet.creator._id === user._id;
+        const userStatus = getStatusFromUserPerspective(bet, isCreator);
+        
+        if (userStatus === 'won') {
+          totalWon += bet.size;
+        } else if (userStatus === 'lost') {
+          totalLost += bet.size;
+        }
+      }
+    });
+
+    return {
+      won: totalWon,
+      lost: totalLost,
+      net: totalWon - totalLost
+    };
+  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -19,12 +44,31 @@ const Dashboard = () => {
     });
   };
 
+  const getStatusFromUserPerspective = (bet, isCreator) => {
+    if (bet.status === 'pending' || bet.status === 'accepted') {
+      return bet.status;
+    }
+    
+    if (bet.status === 'won' || bet.status === 'lost') {
+      if (isCreator) {
+        return bet.status;
+      } else {
+        return bet.status === 'won' ? 'lost' : 'won';
+      }
+    }
+    
+    return bet.status;
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-900 text-yellow-200';
       case 'accepted':
+        return 'bg-yellow-900 text-yellow-200';
+      case 'won':
         return 'bg-green-900 text-green-200';
+      case 'lost':
+        return 'bg-red-900 text-red-200';
       case 'completed':
         return 'bg-blue-900 text-blue-200';
       default:
@@ -32,41 +76,122 @@ const Dashboard = () => {
     }
   };
 
-  const BetCard = ({ bet, showCreator = false }) => (
-    <Link 
-      to={`/accept-bet/${bet._id}`}
-      className="card hover:bg-gray-750 transition-colors duration-200 block"
-    >
-      <div className="flex justify-between items-start mb-3">
-        <h3 className="text-lg font-semibold text-white">{bet.name}</h3>
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(bet.status)}`}>
-          {bet.status === 'pending' ? 'Pending' : 
-           bet.status === 'accepted' ? 'Accepted' : 'Completed'}
-        </span>
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'pending':
+        return 'Pending';
+      case 'accepted':
+        return 'Accepted';
+      case 'won':
+        return 'Won';
+      case 'lost':
+        return 'Lost';
+      case 'completed':
+        return 'Completed';
+      default:
+        return status;
+    }
+  };
+
+  const getMoneyColor = (status) => {
+    switch (status) {
+      case 'won':
+        return 'text-green-400';
+      case 'lost':
+        return 'text-red-400';
+      case 'pending':
+      case 'accepted':
+        return 'text-yellow-400';
+      default:
+        return 'text-green-400';
+    }
+  };
+
+  const handleMarkAsWon = async (betId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setUpdatingBet(betId);
+    try {
+      await markBetAsWon(betId);
+    } catch (error) {
+      console.error('Error marking bet as won:', error);
+    } finally {
+      setUpdatingBet(null);
+    }
+  };
+
+  const handleMarkAsLost = async (betId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setUpdatingBet(betId);
+    try {
+      await markBetAsLost(betId);
+    } catch (error) {
+      console.error('Error marking bet as lost:', error);
+    } finally {
+      setUpdatingBet(null);
+    }
+  };
+
+  const BetCard = ({ bet, showCreator = false }) => {
+    const userStatus = getStatusFromUserPerspective(bet, showCreator);
+    
+    return (
+      <div className="card hover:bg-gray-750 transition-colors duration-200">
+        <Link to={`/accept-bet/${bet._id}`} className="block">
+          <div className="flex justify-between items-start mb-3">
+            <h3 className="text-lg font-semibold text-white">{bet.name}</h3>
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(userStatus)}`}>
+              {getStatusText(userStatus)}
+            </span>
+          </div>
+          
+          <p className="text-gray-300 text-sm mb-4 line-clamp-2">{bet.description}</p>
+          
+          <div className="flex justify-between items-center">
+            <div className={`font-bold ${getMoneyColor(userStatus)}`}>${bet.size}</div>
+            <div className="text-gray-400 text-sm">{formatDate(bet.createdAt)}</div>
+          </div>
+          
+          <div className="mt-3 pt-3 border-t border-gray-700">
+            <p className="text-gray-400 text-sm mb-1">
+              Created by: <span className="text-blue-400">{bet.creator?.name || 'User'}</span>
+            </p>
+            {bet.acceptedBy && (
+              <p className="text-gray-400 text-sm">
+                Accepted by: <span className="text-green-400">{bet.acceptedBy?.name || 'User'}</span>
+              </p>
+            )}
+          </div>
+          
+          <div className="mt-4">
+            <span className="text-blue-400 hover:text-blue-300 text-sm font-medium">
+              View Details →
+            </span>
+          </div>
+        </Link>
+
+        {showCreator && bet.acceptedBy && bet.status === 'accepted' && (
+          <div className="mt-4 pt-4 border-t border-gray-700 flex space-x-2">
+            <button
+              onClick={(e) => handleMarkAsWon(bet._id, e)}
+              disabled={updatingBet === bet._id}
+              className="btn-success flex-1 text-sm py-2"
+            >
+              {updatingBet === bet._id ? 'Updating...' : 'Mark as Won'}
+            </button>
+            <button
+              onClick={(e) => handleMarkAsLost(bet._id, e)}
+              disabled={updatingBet === bet._id}
+              className="btn-danger flex-1 text-sm py-2"
+            >
+              {updatingBet === bet._id ? 'Updating...' : 'Mark as Lost'}
+            </button>
+          </div>
+        )}
       </div>
-      
-      <p className="text-gray-300 text-sm mb-4 line-clamp-2">{bet.description}</p>
-      
-      <div className="flex justify-between items-center">
-        <div className="text-green-400 font-bold">${bet.size}</div>
-        <div className="text-gray-400 text-sm">{formatDate(bet.createdAt)}</div>
-      </div>
-      
-      {showCreator && bet.acceptedBy && (
-        <div className="mt-3 pt-3 border-t border-gray-700">
-          <p className="text-gray-400 text-sm">
-            Accepted by: <span className="text-blue-400">{bet.acceptedBy?.name || 'User'}</span>
-          </p>
-        </div>
-      )}
-      
-      <div className="mt-4">
-        <span className="text-blue-400 hover:text-blue-300 text-sm font-medium">
-          View Details →
-        </span>
-      </div>
-    </Link>
-  );
+    );
+  };
 
   if (loading) {
     return (
@@ -76,13 +201,29 @@ const Dashboard = () => {
     );
   }
 
+  const allBets = [...createdBets, ...acceptedBets];
+  const totalOutcome = calculateTotalOutcome();
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">My Bets Dashboard</h1>
-        <p className="text-gray-400">
-          Welcome back, {user.name}! Manage your bets and track your challenges.
-        </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">My Bets Dashboard</h1>
+            <p className="text-gray-400">
+              Welcome back, {user.name}! Manage your bets and track your challenges.
+            </p>
+          </div>
+          
+          <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 min-w-[200px]">
+            <div className="flex justify-between items-center">
+              <h3 className="text-sm font-medium text-gray-400 mr-4">Your Total Bets Outcome</h3>
+              <span className={`font-bold text-lg ${totalOutcome.net >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {totalOutcome.net >= 0 ? '$' : '-$'}{Math.abs(totalOutcome.net).toFixed(2)}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="mb-6">
@@ -97,87 +238,31 @@ const Dashboard = () => {
         </Link>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="border-b border-gray-700 mb-6">
-        <nav className="flex space-x-8">
-          <button
-            onClick={() => setActiveTab('created')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'created'
-                ? 'border-blue-500 text-blue-400'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-            }`}
-          >
-            Created Bets ({createdBets.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('accepted')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'accepted'
-                ? 'border-blue-500 text-blue-400'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-            }`}
-          >
-            Accepted Bets ({acceptedBets.length})
-          </button>
-        </nav>
-      </div>
-
-      {/* Tab Content */}
       <div>
-        {activeTab === 'created' && (
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-4">Bets You've Created</h2>
-            {createdBets.length === 0 ? (
-              <div className="card text-center">
-                <div className="text-gray-400 mb-4">
-                  <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-medium text-white mb-2">No bets created yet</h3>
-                <p className="text-gray-400 mb-4">
-                  Create your first bet and challenge your friends!
-                </p>
-                <Link to="/create-bet" className="btn-primary">
-                  Create Your First Bet
-                </Link>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {createdBets.map((bet) => (
-                  <BetCard key={bet._id} bet={bet} showCreator={true} />
-                ))}
-              </div>
-            )}
+        <h2 className="text-xl font-semibold text-white mb-4">All Your Bets</h2>
+        {allBets.length === 0 ? (
+          <div className="card text-center">
+            <div className="text-gray-400 mb-4">
+              <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-white mb-2">No bets yet</h3>
+            <p className="text-gray-400 mb-4">
+              Create your first bet and challenge your friends!
+            </p>
+            <Link to="/create-bet" className="btn-primary">
+              Create Your First Bet
+            </Link>
           </div>
-        )}
-
-        {activeTab === 'accepted' && (
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-4">Bets You've Accepted</h2>
-            {acceptedBets.length === 0 ? (
-              <div className="card text-center">
-                <div className="text-gray-400 mb-4">
-                  <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-medium text-white mb-2">No accepted bets yet</h3>
-                <p className="text-gray-400 mb-4">
-                  Accept a bet from a friend to get started!
-                </p>
-                <p className="text-gray-500 text-sm">
-                  Ask your friends to share their bet links with you.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {acceptedBets.map((bet) => (
-                  <BetCard key={bet._id} bet={bet} />
-                ))}
-              </div>
-            )}
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {createdBets.map((bet) => (
+              <BetCard key={bet._id} bet={bet} showCreator={true} />
+            ))}
+            {acceptedBets.map((bet) => (
+              <BetCard key={bet._id} bet={bet} />
+            ))}
           </div>
         )}
       </div>

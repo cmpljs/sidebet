@@ -22,18 +22,6 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                <Link 
-                  to="/dashboard" 
-                  className="text-gray-300 hover:text-white transition-colors duration-200"
-                >
-                  Dashboard
-                </Link>
-                <Link 
-                  to="/create-bet" 
-                  className="text-gray-300 hover:text-white transition-colors duration-200"
-                >
-                  Create Bet
-                </Link>
                 <div className="flex items-center space-x-2">
                   <span className="text-gray-300 text-sm">
                     Welcome, {user.name}

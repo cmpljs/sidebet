@@ -61,6 +61,9 @@ const CreateBet = () => {
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     setSuccess('Link copied to clipboard!');
+    setTimeout(() => {
+      navigate('/dashboard');
+    }, 2000);
   };
 
   return (
@@ -109,7 +112,7 @@ const CreateBet = () => {
               value={formData.name}
               onChange={handleChange}
               className="input-field w-full"
-              placeholder="e.g., Lakers vs Warriors Game"
+              placeholder="e.g., Navi vs Spirit"
               maxLength={100}
             />
           </div>
@@ -147,7 +150,7 @@ const CreateBet = () => {
               value={formData.size}
               onChange={handleChange}
               className="input-field w-full"
-              placeholder="e.g., 50.00"
+              placeholder="e.g., 100"
             />
           </div>
 

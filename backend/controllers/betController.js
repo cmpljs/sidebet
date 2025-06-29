@@ -206,10 +206,194 @@ const getAllBets = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Delete a bet (only if not accepted)
+ * @route   DELETE /api/bets/:id
+ * @access  Private
+ */
+const deleteBet = async (req, res) => {
+  try {
+    const bet = await Bet.findById(req.params.id);
+
+    if (!bet) {
+      return res.status(404).json({
+        success: false,
+        message: 'Bet not found'
+      });
+    }
+
+    // Check if user is the creator of the bet
+    if (bet.creator.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only delete your own bets'
+      });
+    }
+
+    // Check if bet has already been accepted
+    if (bet.acceptedBy) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot delete a bet that has already been accepted'
+      });
+    }
+
+    await Bet.findByIdAndDelete(req.params.id);
+
+    res.json({
+      success: true,
+      message: 'Bet deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete bet error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while deleting bet'
+    });
+  }
+};
+
+/**
+ * @desc    Mark a bet as won (by creator)
+ * @route   POST /api/bets/:id/mark-won
+ * @access  Private
+ */
+const markBetAsWon = async (req, res) => {
+  try {
+    const bet = await Bet.findById(req.params.id);
+
+    if (!bet) {
+      return res.status(404).json({
+        success: false,
+        message: 'Bet not found'
+      });
+    }
+
+    // Check if user is the creator of the bet
+    if (bet.creator.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only the bet creator can mark the bet as won'
+      });
+    }
+
+    // Check if bet has been accepted
+    if (!bet.acceptedBy) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot mark a bet as won before it is accepted'
+      });
+    }
+
+    // Check if bet is already marked as won or lost
+    if (bet.status === 'won' || bet.status === 'lost') {
+      return res.status(400).json({
+        success: false,
+        message: 'Bet has already been marked as won or lost'
+      });
+    }
+
+    // Mark the bet as won by the creator
+    bet.status = 'won';
+    bet.winner = bet.creator;
+    bet.completedAt = new Date();
+    await bet.save();
+
+    // Populate user details
+    await bet.populate('creator', 'name email');
+    await bet.populate('acceptedBy', 'name email');
+    await bet.populate('winner', 'name email');
+
+    res.json({
+      success: true,
+      message: 'Bet marked as won successfully',
+      data: {
+        bet
+      }
+    });
+  } catch (error) {
+    console.error('Mark bet as won error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while marking bet as won'
+    });
+  }
+};
+
+/**
+ * @desc    Mark a bet as lost (by creator)
+ * @route   POST /api/bets/:id/mark-lost
+ * @access  Private
+ */
+const markBetAsLost = async (req, res) => {
+  try {
+    const bet = await Bet.findById(req.params.id);
+
+    if (!bet) {
+      return res.status(404).json({
+        success: false,
+        message: 'Bet not found'
+      });
+    }
+
+    // Check if user is the creator of the bet
+    if (bet.creator.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only the bet creator can mark the bet as lost'
+      });
+    }
+
+    // Check if bet has been accepted
+    if (!bet.acceptedBy) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot mark a bet as lost before it is accepted'
+      });
+    }
+
+    // Check if bet is already marked as won or lost
+    if (bet.status === 'won' || bet.status === 'lost') {
+      return res.status(400).json({
+        success: false,
+        message: 'Bet has already been marked as won or lost'
+      });
+    }
+
+    // Mark the bet as lost by the creator (won by the acceptor)
+    bet.status = 'lost';
+    bet.winner = bet.acceptedBy;
+    bet.completedAt = new Date();
+    await bet.save();
+
+    // Populate user details
+    await bet.populate('creator', 'name email');
+    await bet.populate('acceptedBy', 'name email');
+    await bet.populate('winner', 'name email');
+
+    res.json({
+      success: true,
+      message: 'Bet marked as lost successfully',
+      data: {
+        bet
+      }
+    });
+  } catch (error) {
+    console.error('Mark bet as lost error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while marking bet as lost'
+    });
+  }
+};
+
 module.exports = {
   createBet,
   getBet,
   acceptBet,
   getMyBets,
-  getAllBets
+  getAllBets,
+  deleteBet,
+  markBetAsWon,
+  markBetAsLost
 }; 

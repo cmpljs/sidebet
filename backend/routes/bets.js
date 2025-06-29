@@ -5,7 +5,10 @@ const {
   getBet, 
   acceptBet, 
   getMyBets, 
-  getAllBets 
+  getAllBets,
+  deleteBet,
+  markBetAsWon,
+  markBetAsLost
 } = require('../controllers/betController');
 const { protect, optionalAuth } = require('../middleware/auth');
 const { createBetValidation } = require('../middleware/validation');
@@ -44,5 +47,26 @@ router.get('/:id', optionalAuth, getBet);
  * @access  Private
  */
 router.post('/:id/accept', protect, acceptBet);
+
+/**
+ * @route   DELETE /api/bets/:id
+ * @desc    Delete a bet (only if not accepted)
+ * @access  Private
+ */
+router.delete('/:id', protect, deleteBet);
+
+/**
+ * @route   POST /api/bets/:id/mark-won
+ * @desc    Mark a bet as won (by creator)
+ * @access  Private
+ */
+router.post('/:id/mark-won', protect, markBetAsWon);
+
+/**
+ * @route   POST /api/bets/:id/mark-lost
+ * @desc    Mark a bet as lost (by creator)
+ * @access  Private
+ */
+router.post('/:id/mark-lost', protect, markBetAsLost);
 
 module.exports = router; 

@@ -8,7 +8,8 @@ const {
   getAllBets,
   deleteBet,
   markBetAsWon,
-  markBetAsLost
+  markBetAsLost,
+  getLeaderboard
 } = require('../controllers/betController');
 const { protect, optionalAuth } = require('../middleware/auth');
 const { createBetValidation } = require('../middleware/validation');
@@ -33,6 +34,13 @@ router.get('/my-bets', protect, getMyBets);
  * @access  Private
  */
 router.get('/', protect, getAllBets);
+
+/**
+ * @route   GET /api/bets/leaderboard
+ * @desc    Get leaderboard with user statistics
+ * @access  Public
+ */
+router.get('/leaderboard', getLeaderboard);
 
 /**
  * @route   GET /api/bets/:id

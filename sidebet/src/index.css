@@ -100,4 +100,8 @@ input[type="number"]::-webkit-inner-spin-button {
 
 input[type="number"] {
   -moz-appearance: textfield;
+}
+
+.bg-dark-blue {
+  background-color: rgb(24, 24, 29);
 } 

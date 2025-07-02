@@ -8,6 +8,7 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import CreateBet from './components/CreateBet';
 import AcceptBet from './components/AcceptBet';
+import Leaderboards from './components/Leaderboards';
 import './index.css';
 
 
@@ -29,7 +30,7 @@ function App() {
         <Router>
           <div className="min-h-screen bg-dark-blue text-white">
             <Navbar />
-            <main className="container mx-auto px-4 py-8">
+            <main className="container mx-auto px-4 py-12">
               <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" />} />
                 <Route 
@@ -67,6 +68,14 @@ function App() {
                 <Route 
                   path="/accept-bet/:betId" 
                   element={<AcceptBet />} 
+                />
+                <Route 
+                  path="/leaderboards" 
+                  element={
+                    <ProtectedRoute>
+                      <Leaderboards />
+                    </ProtectedRoute>
+                  } 
                 />
               </Routes>
             </main>

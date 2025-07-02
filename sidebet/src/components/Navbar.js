@@ -15,30 +15,53 @@ const Navbar = () => {
     <nav className="bg-gray-800 border-b border-gray-700">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="text-xl font-bold text-blue-400">
-            SideBet
-          </Link>
+          <div className="flex items-center space-x-8">
+            <Link to="/" className="text-xl font-bold text-blue-400">
+              SideBet
+            </Link>
+            
+            {user && (
+              <div className="hidden md:flex items-center space-x-6">
+                <Link 
+                  to="/dashboard" 
+                  className="text-gray-300 hover:text-white transition-colors duration-200"
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  to="/create-bet" 
+                  className="text-gray-300 hover:text-white transition-colors duration-200"
+                >
+                  Create Bet
+                </Link>
+                <Link 
+                  to="/leaderboards" 
+                  className="text-gray-300 hover:text-white transition-colors duration-200"
+                >
+                  Leaderboards
+                </Link>
+              </div>
+            )}
+          </div>
           
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                <div className="flex items-center space-x-4">
-                  <span className="text-gray-300 text-sm">
-                    Welcome, {user.name}
-                  </span>
-                  <button
-                    onClick={handleLogout}
-                    className="btn-secondary text-sm"
-                  >
-                    Logout
-                  </button>
-                </div>
+                <span className="text-blue-400 text-md font-medium">
+                  {user.name}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="btn-secondary text-sm"
+                >
+                  Logout
+                </button>
               </>
             ) : (
               <>
                 <Link 
                   to="/login" 
-                  className="text-gray-300 hover:text-white transition-colors duration-200"
+                  className="text-blue-400 hover:text-blue-300 transition-colors duration-200 font-medium"
                 >
                   Login
                 </Link>

@@ -387,6 +387,95 @@ const markBetAsLost = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Get leaderboard with user statistics
+ * @route   GET /api/bets/leaderboard
+ * @access  Public
+ */
+const getLeaderboard = async (req, res) => {
+  try {
+    // Get all completed bets (won or lost)
+    const completedBets = await Bet.find({
+      status: { $in: ['won', 'lost'] }
+    }).populate('creator', 'name email')
+      .populate('acceptedBy', 'name email')
+      .populate('winner', 'name email');
+
+    // Calculate statistics for each user
+    const userStats = {};
+
+    completedBets.forEach(bet => {
+      const creatorId = bet.creator._id.toString();
+      const acceptorId = bet.acceptedBy._id.toString();
+      const winnerId = bet.winner ? bet.winner._id.toString() : null;
+
+      // Initialize user stats if not exists
+      if (!userStats[creatorId]) {
+        userStats[creatorId] = {
+          userId: creatorId,
+          name: bet.creator.name,
+          email: bet.creator.email,
+          totalBets: 0,
+          totalWon: 0,
+          totalLost: 0,
+          netWinnings: 0
+        };
+      }
+
+      if (!userStats[acceptorId]) {
+        userStats[acceptorId] = {
+          userId: acceptorId,
+          name: bet.acceptedBy.name,
+          email: bet.acceptedBy.email,
+          totalBets: 0,
+          totalWon: 0,
+          totalLost: 0,
+          netWinnings: 0
+        };
+      }
+
+      // Increment total bets for both users
+      userStats[creatorId].totalBets++;
+      userStats[acceptorId].totalBets++;
+
+      // Calculate winnings/losses
+      if (winnerId === creatorId) {
+        userStats[creatorId].totalWon += bet.size;
+        userStats[creatorId].netWinnings += bet.size;
+        userStats[acceptorId].totalLost += bet.size;
+        userStats[acceptorId].netWinnings -= bet.size;
+      } else if (winnerId === acceptorId) {
+        userStats[acceptorId].totalWon += bet.size;
+        userStats[acceptorId].netWinnings += bet.size;
+        userStats[creatorId].totalLost += bet.size;
+        userStats[creatorId].netWinnings -= bet.size;
+      }
+    });
+
+    // Convert to array and sort by net winnings (descending)
+    const leaderboard = Object.values(userStats)
+      .sort((a, b) => b.netWinnings - a.netWinnings)
+      .map((user, index) => ({
+        ...user,
+        rank: index + 1
+      }));
+
+    res.json({
+      success: true,
+      data: {
+        leaderboard,
+        count: leaderboard.length
+      }
+    });
+  } catch (error) {
+    console.error('Get leaderboard error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching leaderboard'
+    });
+  }
+};
+
 module.exports = {
   createBet,
   getBet,
@@ -395,5 +484,6 @@ module.exports = {
   getAllBets,
   deleteBet,
   markBetAsWon,
-  markBetAsLost
+  markBetAsLost,
+  getLeaderboard
 }; 

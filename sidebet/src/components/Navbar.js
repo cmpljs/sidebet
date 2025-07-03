@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { UI_CONFIG } from '../config/uiConfig';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -17,7 +18,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
             <Link to="/" className="text-xl font-bold text-blue-400">
-              SideBet
+              {UI_CONFIG.LOGO_TEXT}
             </Link>
             
             {user && (
@@ -26,19 +27,19 @@ const Navbar = () => {
                   to="/dashboard" 
                   className="text-gray-300 hover:text-white transition-colors duration-200"
                 >
-                  Dashboard
+                  {UI_CONFIG.DASHBOARD_TEXT}
                 </Link>
                 <Link 
                   to="/create-bet" 
                   className="text-gray-300 hover:text-white transition-colors duration-200"
                 >
-                  Create Bet
+                  {UI_CONFIG.CREATE_BET_TEXT}
                 </Link>
                 <Link 
                   to="/leaderboards" 
                   className="text-gray-300 hover:text-white transition-colors duration-200"
                 >
-                  Leaderboards
+                  {UI_CONFIG.LEADERBOARDS_TEXT}
                 </Link>
               </div>
             )}

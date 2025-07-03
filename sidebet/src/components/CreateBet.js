@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useBets } from '../contexts/BetContext';
+import { UI_CONFIG } from '../config/uiConfig';
 
 const CreateBet = () => {
   const [formData, setFormData] = useState({
@@ -69,9 +70,9 @@ const CreateBet = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Create a New Bet</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">{UI_CONFIG.CREATE_BET_TITLE}</h1>
         <p className="text-gray-400">
-          Create a bet and share it with friends to challenge them!
+          {UI_CONFIG.CREATE_BET_DESCRIPTION}
         </p>
       </div>
 
@@ -160,7 +161,7 @@ const CreateBet = () => {
               disabled={loading}
               className="btn-primary flex-1 py-3"
             >
-              {loading ? 'Creating Bet...' : 'Create Bet'}
+              {loading ? UI_CONFIG.CREATING_BET_TEXT : UI_CONFIG.CREATE_BET_TEXT}
             </button>
             <button
               type="button"

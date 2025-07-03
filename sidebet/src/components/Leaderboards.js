@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../utils/api';
+import { UI_CONFIG } from '../config/uiConfig';
 
 const useCountAnimation = (endValue, duration = 2000) => {
   const [count, setCount] = useState(0);
@@ -148,10 +149,10 @@ const Leaderboards = () => {
         {/* Header */}
         <div className="text-left mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
           <h1 className="text-4xl font-bold text-white mb-4">
-            Leaderboards
+            {UI_CONFIG.LEADERBOARDS_TEXT}
           </h1>
           <p className="text-gray-400 text-lg">
-            See who's winning the most bets and climbing the ranks
+            {UI_CONFIG.LEADERBOARDS_DESCRIPTION}
           </p>
         </div>
 
@@ -269,9 +270,9 @@ const Leaderboards = () => {
           {leaderboard.length === 0 && (
             <div className="text-center py-12 animate-slide-up" style={{ animationDelay: '0.6s' }}>
               <div className="text-6xl mb-4">🏆</div>
-              <h3 className="text-xl font-semibold text-gray-300 mb-2">No completed bets yet</h3>
+              <h3 className="text-xl font-semibold text-gray-300 mb-2">{UI_CONFIG.NO_COMPLETED_BETS_TEXT}</h3>
               <p className="text-gray-500">
-                Complete some bets to see the leaderboard in action!
+                {UI_CONFIG.NO_COMPLETED_BETS_DESCRIPTION}
               </p>
             </div>
           )}
@@ -283,7 +284,7 @@ const Leaderboards = () => {
             onClick={fetchLeaderboard}
             className="px-6 py-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors font-medium"
           >
-            Refresh Leaderboard
+            {UI_CONFIG.REFRESH_LEADERBOARD_TEXT}
           </button>
         </div>
       </div>

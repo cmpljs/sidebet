@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useBets } from '../contexts/BetContext';
+import { UI_CONFIG, formatUIText } from '../config/uiConfig';
 
 const useCountAnimation = (endValue, duration = 2000) => {
   const [count, setCount] = useState(0);
@@ -305,9 +306,9 @@ const Dashboard = () => {
       <div className="mb-8">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">My Bets Dashboard</h1>
+            <h1 className="text-3xl font-bold text-white mb-2">{UI_CONFIG.DASHBOARD_TITLE}</h1>
             <p className="text-gray-400">
-              Welcome back, {user.name}! Manage your bets and track your challenges.
+              {formatUIText(UI_CONFIG.DASHBOARD_WELCOME, { name: user.name })}
             </p>
           </div>
           
@@ -328,12 +329,12 @@ const Dashboard = () => {
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Create New Bet
+          {UI_CONFIG.CREATE_NEW_BET_TEXT}
         </Link>
       </div>
 
       <div>
-        <h2 className="text-xl font-semibold text-white mb-4">All Your Bets</h2>
+        <h2 className="text-xl font-semibold text-white mb-4">{UI_CONFIG.ALL_YOUR_BETS_TEXT}</h2>
         {allBets.length === 0 ? (
           <div className="card text-center">
             <div className="text-gray-400 mb-4">
@@ -341,12 +342,12 @@ const Dashboard = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-white mb-2">No bets yet</h3>
+            <h3 className="text-lg font-medium text-white mb-2">{UI_CONFIG.NO_BETS_YET_TEXT}</h3>
             <p className="text-gray-400 mb-4">
-              Create your first bet and challenge your friends!
+              {UI_CONFIG.NO_BETS_DESCRIPTION}
             </p>
             <Link to="/create-bet" className="btn-primary">
-              Create Your First Bet
+              {UI_CONFIG.CREATE_FIRST_BET_TEXT}
             </Link>
           </div>
         ) : (

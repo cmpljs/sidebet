@@ -18,6 +18,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: rgb(51, 50, 62);
   color: #f8fafc;
+  /* Prevent layout shift */
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
 }
 
 code {
@@ -43,6 +46,47 @@ code {
   background: #64748b;
 }
 
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
+/* Additional scrollbar hiding for leaderboards */
+.scrollbar-hide::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar-track,
+.scrollbar-hide::-webkit-scrollbar-thumb {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Leaderboards page specific scrollbar hiding */
+.leaderboards-page {
+  /* Don't override global scrollbar behavior */
+}
+
+.leaderboards-page * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.leaderboards-page *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Prevent layout shift from scrollbar */
+html {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
 /* Slide-up animation for bet cards */
 @keyframes slide-up {
   0% {
@@ -57,6 +101,58 @@ code {
 
 .animate-slide-up {
   animation: slide-up 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+/* Fade-in animation for leaderboards */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+/* Staggered slide-in for table rows */
+@keyframes slide-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+/* Pulse animation for stats */
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
 }
 
 /* Custom button styles */

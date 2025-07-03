@@ -143,10 +143,10 @@ const Leaderboards = () => {
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-white p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-transparent text-white p-6 leaderboards-page">
+      <div className="max-w-6xl mx-auto scrollbar-hide">
         {/* Header */}
-        <div className="text-left mb-8">
+        <div className="text-left mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
           <h1 className="text-4xl font-bold text-white mb-4">
             Leaderboards
           </h1>
@@ -157,13 +157,13 @@ const Leaderboards = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="card rounded-2xl">
+          <div className="card rounded-2xl animate-slide-up" style={{ animationDelay: '0.2s' }}>
             <div className="text-center">
               <h3 className="text-lg font-semibold text-white">Total Players</h3>
               <p className="text-3xl font-bold text-white">{leaderboard.length}</p>
             </div>
           </div>
-          <div className="card rounded-2xl">
+          <div className="card rounded-2xl animate-slide-up" style={{ animationDelay: '0.3s' }}>
             <div className="text-center">
               <h3 className="text-lg font-semibold text-white">Top Winner</h3>
               <p className="text-xl font-bold text-green-400">
@@ -171,7 +171,7 @@ const Leaderboards = () => {
               </p>
             </div>
           </div>
-          <div className="card rounded-2xl">
+          <div className="card rounded-2xl animate-slide-up" style={{ animationDelay: '0.4s' }}>
             <div className="text-center">
               <h3 className="text-lg font-semibold text-white">Highest Winnings</h3>
               <p className="text-xl font-bold text-green-400">
@@ -187,8 +187,8 @@ const Leaderboards = () => {
         </div>
 
         {/* Leaderboard Table */}
-        <div className="card rounded-2xl overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className="card rounded-2xl overflow-hidden scrollbar-hide animate-fade-in" style={{ animationDelay: '0.5s' }}>
+          <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full">
               <thead className="bg-gray-800">
                 <tr>
@@ -216,9 +216,10 @@ const Leaderboards = () => {
                 {leaderboard.map((player, index) => (
                   <tr 
                     key={player.userId}
-                    className={`hover:bg-gray-750 transition-colors ${
+                    className={`hover:bg-gray-750 transition-colors animate-slide-in-right ${
                       player.userId === user?._id ? 'bg-blue-900/20 border-l-4 border-blue-500' : ''
                     }`}
+                    style={{ animationDelay: `${0.6 + (index * 0.08)}s` }}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getRankBadge(player.rank)}
@@ -238,9 +239,6 @@ const Leaderboards = () => {
                                 You
                               </span>
                             )}
-                          </div>
-                          <div className="text-sm text-gray-400">
-                            {player.email}
                           </div>
                         </div>
                       </div>
@@ -269,7 +267,7 @@ const Leaderboards = () => {
           </div>
 
           {leaderboard.length === 0 && (
-            <div className="text-center py-12">
+            <div className="text-center py-12 animate-slide-up" style={{ animationDelay: '0.6s' }}>
               <div className="text-6xl mb-4">🏆</div>
               <h3 className="text-xl font-semibold text-gray-300 mb-2">No completed bets yet</h3>
               <p className="text-gray-500">
@@ -280,7 +278,7 @@ const Leaderboards = () => {
         </div>
 
         {/* Refresh Button */}
-        <div className="text-center mt-8">
+        <div className="text-center mt-8 animate-slide-up" style={{ animationDelay: '0.8s' }}>
           <button
             onClick={fetchLeaderboard}
             className="px-6 py-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors font-medium"

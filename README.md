@@ -1,4 +1,4 @@
-# SideBet - Complete Betting Application
+# SideBet - Application for tracking side bets with your frineds
 
 A full-stack betting application built with React frontend and Node.js backend, featuring user authentication, bet creation, and bet acceptance functionality.
 

@@ -14,10 +14,10 @@ const Navbar = () => {
 
   return (
     <nav className="bg-gray-800 border-b border-gray-700">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-between items-center h-16 w-full">
           <div className="flex items-center space-x-8">
-            <Link to="/" className="text-xl font-bold text-blue-400">
+            <Link to="/" className="text-2xl font-bold text-blue-300">
               {UI_CONFIG.LOGO_TEXT}
             </Link>
             
@@ -30,16 +30,17 @@ const Navbar = () => {
                   {UI_CONFIG.DASHBOARD_TEXT}
                 </Link>
                 <Link 
-                  to="/create-bet" 
-                  className="text-gray-300 hover:text-white transition-colors duration-200"
-                >
-                  {UI_CONFIG.CREATE_BET_TEXT}
-                </Link>
-                <Link 
                   to="/leaderboards" 
                   className="text-gray-300 hover:text-white transition-colors duration-200"
                 >
                   {UI_CONFIG.LEADERBOARDS_TEXT}
+                </Link>
+                <Link 
+                  to="/create-bet" 
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                >
+                  <span className="text-lg font-bold">+</span>
+                  <span>{UI_CONFIG.CREATE_BET_TEXT}</span>
                 </Link>
               </div>
             )}

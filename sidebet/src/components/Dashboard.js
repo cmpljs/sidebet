@@ -325,17 +325,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-      <div className="mb-6">
-        <Link 
-          to="/create-bet"
-          className="btn-primary inline-flex items-center"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          {UI_CONFIG.CREATE_NEW_BET_TEXT}
-        </Link>
-      </div>
+
 
       <div>
         <h2 className="text-xl font-semibold text-white mb-4">{UI_CONFIG.ALL_YOUR_BETS_TEXT}</h2>

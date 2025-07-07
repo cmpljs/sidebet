@@ -5,7 +5,7 @@ A full-stack application built with React frontend and Node.js backend, featurin
 ## 🏗️ Project Structure
 
 ```
-sotka/
+sidebet/
 ├── sidebet/          # React Frontend
 │   ├── src/
 │   │   ├── components/
@@ -36,7 +36,7 @@ sotka/
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd sotka
+   cd sidebet
    ```
 
 2. **Install all dependencies**

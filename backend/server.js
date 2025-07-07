@@ -37,14 +37,17 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+const healthHandler = (req, res) => {
   res.json({
     success: true,
     message: 'SideBet API is running',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV
   });
-});
+};
+
+app.get('/health', healthHandler);
+app.get('/api/health', healthHandler);
 
 // API routes
 app.use('/api', authRoutes);

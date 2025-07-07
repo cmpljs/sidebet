@@ -68,16 +68,19 @@ const CreateBet = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">{UI_CONFIG.CREATE_BET_TITLE}</h1>
-        <p className="text-gray-400">
-          {UI_CONFIG.CREATE_BET_DESCRIPTION}
-        </p>
-      </div>
+    <div className="min-h-screen bg-transparent text-white p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-white mb-4">{UI_CONFIG.CREATE_BET_TITLE}</h1>
+          <p className="text-gray-400 text-lg">
+            {UI_CONFIG.CREATE_BET_DESCRIPTION}
+          </p>
+          </div>
 
-      <div className="card">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Content */}
+        <div className="card rounded-2xl">
+            <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <div className="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded-lg">
               {error}
@@ -172,6 +175,7 @@ const CreateBet = () => {
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

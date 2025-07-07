@@ -55,14 +55,34 @@ const Leaderboards = () => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [animationComplete, setAnimationComplete] = useState(false);
 
   useEffect(() => {
     fetchLeaderboard();
   }, []);
 
+  useEffect(() => {
+    if (!loading && !error && leaderboard.length > 0) {
+      // Calculate when the last animation should complete
+      const lastAnimationDelay = 0.6 + ((leaderboard.length - 1) * 0.08);
+      const animationDuration = 0.5; // CSS animation duration
+      const totalTime = (lastAnimationDelay + animationDuration) * 1000;
+      
+      const timer = setTimeout(() => {
+        setAnimationComplete(true);
+      }, totalTime);
+      
+      return () => clearTimeout(timer);
+    } else if (!loading && !error) {
+      // No data to animate, animation is immediately complete
+      setAnimationComplete(true);
+    }
+  }, [loading, error, leaderboard.length]);
+
   const fetchLeaderboard = async () => {
     try {
       setLoading(true);
+      setAnimationComplete(false); // Reset animation state
       const jwt = localStorage.getItem('sidebet_jwt');
       const response = await api.get('/bets/leaderboard', { token: jwt });
       setLeaderboard(response.data.leaderboard);
@@ -75,31 +95,11 @@ const Leaderboards = () => {
   };
 
   const getRankBadge = (rank) => {
-    if (rank === 1) {
-      return (
-        <div className="flex items-center justify-center w-8 h-8 bg-yellow-500 text-yellow-900 font-bold rounded-full">
-          🥇
-        </div>
-      );
-    } else if (rank === 2) {
-      return (
-        <div className="flex items-center justify-center w-8 h-8 bg-gray-400 text-gray-900 font-bold rounded-full">
-          🥈
-        </div>
-      );
-    } else if (rank === 3) {
-      return (
-        <div className="flex items-center justify-center w-8 h-8 bg-amber-600 text-amber-100 font-bold rounded-full">
-          🥉
-        </div>
-      );
-    } else {
-      return (
-        <div className="flex items-center justify-center w-8 h-8 bg-gray-700 text-gray-300 font-bold rounded-full">
-          {rank}
-        </div>
-      );
-    }
+    return (
+      <div className="flex items-center justify-center w-8 h-8 bg-gray-700 text-gray-300 font-bold rounded-full">
+        {rank}
+      </div>
+    );
   };
 
   const getNetWinningsColor = (netWinnings) => {
@@ -112,42 +112,11 @@ const Leaderboards = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white p-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="mt-4 text-gray-400">Loading leaderboard...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white p-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center">
-            <p className="text-red-400">{error}</p>
-            <button 
-              onClick={fetchLeaderboard}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-            >
-              Try Again
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-transparent text-white p-6 leaderboards-page">
-      <div className="max-w-6xl mx-auto scrollbar-hide">
+    <div className="min-h-screen bg-transparent text-white p-6">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-left mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+        <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-4">
             {UI_CONFIG.LEADERBOARDS_TEXT}
           </h1>
@@ -158,128 +127,142 @@ const Leaderboards = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="card rounded-2xl animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-white">Total Players</h3>
+          <div className="card rounded-2xl">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold text-white">Total Players</h3>
+                <p className="text-gray-400 text-sm">Active participants</p>
+              </div>
               <p className="text-3xl font-bold text-white">{leaderboard.length}</p>
             </div>
           </div>
-          <div className="card rounded-2xl animate-slide-up" style={{ animationDelay: '0.3s' }}>
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-white">Top Winner</h3>
+          <div className="card rounded-2xl">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold text-white">Top Winner</h3>
+                <p className="text-gray-400 text-sm">Leading player</p>
+              </div>
               <p className="text-xl font-bold text-green-400">
                 {leaderboard.length > 0 ? leaderboard[0].name : 'N/A'}
               </p>
             </div>
           </div>
-          <div className="card rounded-2xl animate-slide-up" style={{ animationDelay: '0.4s' }}>
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-white">Highest Winnings</h3>
+          <div className="card rounded-2xl">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold text-white">Highest Winnings</h3>
+                <p className="text-gray-400 text-sm">Best performance</p>
+              </div>
               <p className="text-xl font-bold text-green-400">
-                {leaderboard.length > 0 ? (
-                  <AnimatedValue 
-                    value={leaderboard[0].netWinnings} 
-                    className="text-green-400"
-                  />
-                ) : '$0.00'}
+                {leaderboard.length > 0 ? `$${leaderboard[0].netWinnings.toFixed(2)}` : '$0.00'}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Leaderboard Table */}
-        <div className="card rounded-2xl overflow-hidden scrollbar-hide animate-fade-in" style={{ animationDelay: '0.5s' }}>
-          <div className="overflow-x-auto scrollbar-hide">
-            <table className="w-full">
-              <thead className="bg-gray-800">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Rank
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Player
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Total Bets
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Won
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Lost
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Net Winnings
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-700">
-                {leaderboard.map((player, index) => (
-                  <tr 
-                    key={player.userId}
-                    className={`hover:bg-gray-750 transition-colors animate-slide-in-right ${
-                      player.userId === user?._id ? 'bg-blue-900/20 border-l-4 border-blue-500' : ''
-                    }`}
-                    style={{ animationDelay: `${0.6 + (index * 0.08)}s` }}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getRankBadge(player.rank)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
-                            {player.name.charAt(0).toUpperCase()}
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-white">
-                            {player.name}
-                            {player.userId === user?._id && (
-                              <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-1 rounded-full">
-                                You
-                              </span>
-                            )}
-                          </div>
-                        </div>
+        {/* Content */}
+        <div className={`card rounded-2xl overflow-hidden ${!animationComplete ? 'scrollbar-hide' : ''}`}>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="mt-4 text-gray-400">Loading leaderboard...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-red-400 mb-4">{error}</p>
+              <button 
+                onClick={fetchLeaderboard}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className={`overflow-x-auto ${!animationComplete ? 'scrollbar-hide' : ''}`}>
+                <table className="w-full">
+                  <thead className="bg-gray-800">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Rank
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Player
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Total Bets
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Won
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Lost
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Net Winnings
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-700">
+                    {leaderboard.map((player, index) => (
+                      <tr 
+                        key={player.userId}
+                        className={`hover:bg-gray-750 transition-colors animate-slide-in-right ${
+                          player.userId === user?._id ? 'bg-blue-900/20 border-l-4 border-blue-500' : ''
+                        }`}
+                        style={{ animationDelay: `${0.6 + (index * 0.08)}s` }}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {getRankBadge(player.rank)}
+                        </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-white">
+                        {player.name}
+                        {player.userId === user?._id && (
+                          <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-1 rounded-full">
+                            You
+                          </span>
+                        )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {player.totalBets}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-medium">
-                      ${player.totalWon.toFixed(2)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-medium">
-                      ${player.totalLost.toFixed(2)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`text-sm font-bold ${getNetWinningsColor(player.netWinnings)}`}>
-                        <AnimatedValue 
-                          value={player.netWinnings} 
-                          className={getNetWinningsColor(player.netWinnings)}
-                        />
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          {player.totalBets}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-medium">
+                          ${player.totalWon.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-medium">
+                          ${player.totalLost.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`text-sm font-bold ${getNetWinningsColor(player.netWinnings)}`}>
+                            <AnimatedValue 
+                              value={player.netWinnings} 
+                              className={getNetWinningsColor(player.netWinnings)}
+                            />
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-          {leaderboard.length === 0 && (
-            <div className="text-center py-12 animate-slide-up" style={{ animationDelay: '0.6s' }}>
-              <div className="text-6xl mb-4">🏆</div>
-              <h3 className="text-xl font-semibold text-gray-300 mb-2">{UI_CONFIG.NO_COMPLETED_BETS_TEXT}</h3>
-              <p className="text-gray-500">
-                {UI_CONFIG.NO_COMPLETED_BETS_DESCRIPTION}
-              </p>
-            </div>
+              {leaderboard.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4">🏆</div>
+                  <h3 className="text-xl font-semibold text-gray-300 mb-2">{UI_CONFIG.NO_COMPLETED_BETS_TEXT}</h3>
+                  <p className="text-gray-500">
+                    {UI_CONFIG.NO_COMPLETED_BETS_DESCRIPTION}
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
 
         {/* Refresh Button */}
-        <div className="text-center mt-8 animate-slide-up" style={{ animationDelay: '0.8s' }}>
+        <div className="text-center mt-8">
           <button
             onClick={fetchLeaderboard}
             className="px-6 py-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors font-medium"

@@ -188,10 +188,12 @@ const AcceptBet = () => {
 
   if (error && !bet) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <div className="card text-center">
-          <h1 className="text-2xl font-bold text-red-400 mb-4">Bet Not Found</h1>
-          <p className="text-gray-400 mb-6">{error}</p>
+      <div className="min-h-screen bg-transparent text-white p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="card text-center">
+            <h1 className="text-2xl font-bold text-red-400 mb-4">Bet Not Found</h1>
+            <p className="text-gray-400 mb-6">{error}</p>
+          </div>
         </div>
       </div>
     );
@@ -202,7 +204,41 @@ const AcceptBet = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto relative">
+    <div className="min-h-screen bg-transparent text-white p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          {user && bet.creator._id === user._id ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-4xl font-bold text-white mb-4">Your Bet</h1>
+                <p className="text-gray-400 text-lg">
+                  Share this bet with friends to challenge them!
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  const shareableLink = `${window.location.origin}/accept-bet/${bet._id}`;
+                  navigator.clipboard.writeText(shareableLink);
+                  setSuccess('Link copied to clipboard!');
+                }}
+                className="btn-primary px-6 py-3"
+              >
+                Copy Link
+              </button>
+            </div>
+          ) : (
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-4">Accept Bet</h1>
+              <p className="text-gray-400 text-lg">
+                Review the bet details and accept the challenge!
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="relative">
       {(accepting || deleting) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-800 p-6 rounded-lg flex items-center space-x-3">
@@ -213,37 +249,7 @@ const AcceptBet = () => {
           </div>
         </div>
       )}
-      <div className="mb-8">
-        {user && bet.creator._id === user._id ? (
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Your Bet</h1>
-              <p className="text-gray-400">
-                Share this bet with friends to challenge them!
-              </p>
-            </div>
-            <button
-              onClick={() => {
-                const shareableLink = `${window.location.origin}/accept-bet/${bet._id}`;
-                navigator.clipboard.writeText(shareableLink);
-                setSuccess('Link copied to clipboard!');
-              }}
-              className="btn-primary px-6 py-3"
-            >
-              Copy Link
-            </button>
-          </div>
-        ) : (
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Accept Bet</h1>
-            <p className="text-gray-400">
-              Review the bet details and accept the challenge!
-            </p>
-          </div>
-        )}
-      </div>
-
-      <div className="card">
+      <div className="card rounded-2xl">
         {error && (
           <div className="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded-lg mb-6">
             {error}
@@ -329,6 +335,8 @@ const AcceptBet = () => {
         <Link to="/dashboard" className="btn-secondary w-full">
           Back to Dashboard
         </Link>
+      </div>
+        </div>
       </div>
     </div>
   );

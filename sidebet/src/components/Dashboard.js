@@ -302,24 +302,28 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="mb-8">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">{UI_CONFIG.DASHBOARD_TITLE}</h1>
-            <p className="text-gray-400">
-              {formatUIText(UI_CONFIG.DASHBOARD_WELCOME, { name: user.name })}
-            </p>
-          </div>
-          
-          <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 w-[180px] md:w-[220px]">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center">
-              <h3 className="text-md font-medium text-gray-400 mb-2 md:mb-0">Total</h3>
-              <AnimatedValue value={totalOutcome.net} className={`font-bold text-lg ${totalOutcome.net >= 0 ? 'text-green-400' : 'text-red-400'}`} />
+    <div className="min-h-screen bg-transparent text-white p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-white mb-4">{UI_CONFIG.DASHBOARD_TITLE}</h1>
+          <p className="text-gray-400 text-lg">
+            {formatUIText(UI_CONFIG.DASHBOARD_WELCOME, { name: user.name })}
+          </p>
+        </div>
+
+        {/* Stats Card */}
+        <div className="mb-8">
+          <div className="card rounded-2xl">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold text-white">Total Net Winnings</h3>
+                <p className="text-gray-400 text-sm">Your overall performance</p>
+              </div>
+              <AnimatedValue value={totalOutcome.net} className={`font-bold text-3xl ${totalOutcome.net >= 0 ? 'text-green-400' : 'text-red-400'}`} />
             </div>
           </div>
         </div>
-      </div>
 
       <div className="mb-6">
         <Link 
@@ -367,6 +371,7 @@ const Dashboard = () => {
             })}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

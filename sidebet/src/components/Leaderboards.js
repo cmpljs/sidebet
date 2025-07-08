@@ -50,35 +50,6 @@ const AnimatedValue = ({ value, className }) => {
   );
 };
 
-// Loading spinner component for stats
-const LoadingSpinner = ({ size = "w-6 h-6" }) => (
-  <div className={`animate-spin rounded-full border-2 border-gray-600 border-t-blue-500 ${size}`}></div>
-);
-
-// Skeleton component for player rows
-const PlayerSkeleton = () => (
-  <tr className="animate-pulse">
-    <td className="px-6 py-4 whitespace-nowrap">
-      <div className="w-8 h-8 bg-gray-700 rounded-full"></div>
-    </td>
-    <td className="px-6 py-4 whitespace-nowrap">
-      <div className="h-4 bg-gray-700 rounded w-24"></div>
-    </td>
-    <td className="px-6 py-4 whitespace-nowrap">
-      <div className="h-4 bg-gray-700 rounded w-12"></div>
-    </td>
-    <td className="px-6 py-4 whitespace-nowrap">
-      <div className="h-4 bg-gray-700 rounded w-16"></div>
-    </td>
-    <td className="px-6 py-4 whitespace-nowrap">
-      <div className="h-4 bg-gray-700 rounded w-16"></div>
-    </td>
-    <td className="px-6 py-4 whitespace-nowrap">
-      <div className="h-4 bg-gray-700 rounded w-20"></div>
-    </td>
-  </tr>
-);
-
 const Leaderboards = () => {
   const { user } = useAuth();
   const [leaderboard, setLeaderboard] = useState([]);
@@ -162,9 +133,7 @@ const Leaderboards = () => {
                 <h3 className="text-lg font-semibold text-white">Total Players</h3>
                 <p className="text-gray-400 text-sm">Active participants</p>
               </div>
-              {loading ? (
-                <LoadingSpinner size="w-8 h-8" />
-              ) : (
+              {!loading && (
                 <p className="text-3xl font-bold text-white">{leaderboard.length}</p>
               )}
             </div>
@@ -175,9 +144,7 @@ const Leaderboards = () => {
                 <h3 className="text-lg font-semibold text-white">Top Winner</h3>
                 <p className="text-gray-400 text-sm">Leading player</p>
               </div>
-              {loading ? (
-                <LoadingSpinner size="w-6 h-6" />
-              ) : (
+              {!loading && (
                 <p className="text-xl font-bold text-green-400">
                   {leaderboard.length > 0 ? leaderboard[0].name : 'N/A'}
                 </p>
@@ -190,9 +157,7 @@ const Leaderboards = () => {
                 <h3 className="text-lg font-semibold text-white">Highest Winnings</h3>
                 <p className="text-gray-400 text-sm">Best performance</p>
               </div>
-              {loading ? (
-                <LoadingSpinner size="w-6 h-6" />
-              ) : (
+              {!loading && (
                 <p className="text-xl font-bold text-green-400">
                   {leaderboard.length > 0 ? `$${leaderboard[0].netWinnings.toFixed(2)}` : '$0.00'}
                 </p>
@@ -219,75 +184,67 @@ const Leaderboards = () => {
                 <table className="w-full">
                   <thead className="bg-gray-800">
                     <tr>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-16">
                         Rank
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-48">
                         Player
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">
                         Total Bets
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">
                         Won
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">
                         Lost
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-40">
                         Net Winnings
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-700">
-                    {loading ? (
-                      <>
-                        <PlayerSkeleton />
-                        <PlayerSkeleton />
-                        <PlayerSkeleton />
-                      </>
-                    ) : (
-                      leaderboard.map((player, index) => (
-                        <tr 
-                          key={player.userId}
-                          className={`hover:bg-gray-750 transition-colors animate-slide-in-right ${
-                            player.userId === user?._id ? 'bg-blue-900/20 border-l-4 border-blue-500' : ''
-                          }`}
-                          style={{ animationDelay: `${0.6 + (index * 0.08)}s` }}
-                        >
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {getRankBadge(player.rank)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-white">
-                              {player.name}
-                              {player.userId === user?._id && (
-                                <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-1 rounded-full">
-                                  You
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                            {player.totalBets}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-medium">
-                            ${player.totalWon.toFixed(2)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-medium">
-                            ${player.totalLost.toFixed(2)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`text-sm font-bold ${getNetWinningsColor(player.netWinnings)}`}>
-                              <AnimatedValue 
-                                value={player.netWinnings} 
-                                className={getNetWinningsColor(player.netWinnings)}
-                              />
-                            </span>
-                          </td>
-                        </tr>
-                      ))
-                    )}
+                    {!loading && leaderboard.map((player, index) => (
+                      <tr 
+                        key={player.userId}
+                        className={`hover:bg-gray-750 transition-colors animate-slide-in-right ${
+                          player.userId === user?._id ? 'bg-blue-900/20 border-l-4 border-blue-500' : ''
+                        }`}
+                        style={{ animationDelay: `${0.6 + (index * 0.08)}s` }}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {getRankBadge(player.rank)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-white">
+                            {player.name}
+                            {player.userId === user?._id && (
+                              <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-1 rounded-full">
+                                You
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          {player.totalBets}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-medium">
+                          ${player.totalWon.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-medium">
+                          ${player.totalLost.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`text-sm font-bold ${getNetWinningsColor(player.netWinnings)}`}>
+                            <AnimatedValue 
+                              value={player.netWinnings} 
+                              className={getNetWinningsColor(player.netWinnings)}
+                            />
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>

@@ -1,6 +1,9 @@
 // UI Configuration - Text values for the application
 // These can be easily modified to change the displayed text throughout the app
 
+// Debug: Log the environment variable value
+console.log('REACT_APP_LOGO_TEXT:', process.env.REACT_APP_LOGO_TEXT);
+
 export const UI_CONFIG = {
   // Logo and branding
   LOGO_TEXT: process.env.REACT_APP_LOGO_TEXT || 'SideBet',

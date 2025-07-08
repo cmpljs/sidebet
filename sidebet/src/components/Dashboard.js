@@ -51,6 +51,11 @@ const AnimatedValue = ({ value, className }) => {
   );
 };
 
+// Loading spinner component for stats
+const LoadingSpinner = ({ size = "w-6 h-6" }) => (
+  <div className={`animate-spin rounded-full border-2 border-gray-600 border-t-blue-500 ${size}`}></div>
+);
+
 const Dashboard = () => {
   const { user } = useAuth();
   const { getBetsByCreator, getBetsByAcceptor, markBetAsWon, markBetAsLost, loading } = useBets();
@@ -320,7 +325,11 @@ const Dashboard = () => {
                 <h3 className="text-lg font-semibold text-white">Total Net Winnings</h3>
                 <p className="text-gray-400 text-sm">Your overall performance</p>
               </div>
-              <AnimatedValue value={totalOutcome.net} className={`font-bold text-3xl ${totalOutcome.net >= 0 ? 'text-green-400' : 'text-red-400'}`} />
+              {loading ? (
+                <LoadingSpinner size="w-8 h-8" />
+              ) : (
+                <AnimatedValue value={totalOutcome.net} className={`font-bold text-3xl ${totalOutcome.net >= 0 ? 'text-green-400' : 'text-red-400'}`} />
+              )}
             </div>
           </div>
         </div>
